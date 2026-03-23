@@ -1,33 +1,76 @@
 #:kivy 2.1.0
-<Blind>:    
-    # canvas:
-    #     Rectangle: #center line
-    #         pos: self.center_x, 0
-    #         size: 10, self.height
-            
-    # Label: #file button
-    #     font_size: 40  
-    #     center_x: 40
-    #     top: root.top - 10
-    #     text: "File"
-        
-    # Label: 
-    #     font_size: 70  
-    #     center_x: root.width * 3 / 4
-    #     top: root.top - 50
-    #     text: "0"
+
+<Blind>:
     BoxLayout:
         orientation: 'vertical'
-        center_x: root.width * 1 / 2
-        top: root.top * 1/2
-        Camera:
-            id: camera
-            resolution: (1080, 1920)
-            play: True
-            size_hint: (1, 1)
-
-        Button:
-            text: 'Capture'
-            size_hint_y: None
-            height: '48dp'
-            on_release: app.capture_photo()
+        padding: 10
+        spacing: 10
+        
+        # Camera section
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: 0.5
+            
+            # Camera preview sometimes unreliable in Kivy on Windows; we capture directly via OpenCV.
+            Camera:
+                id: camera
+                resolution: (1080, 1920)
+                play: True
+                size_hint_y: 0.85
+                pos: root.width / 2 + 30 , root.height / 2 + 30
+            
+            Button:
+                id: capture_button
+                text: 'Capture'
+                size_hint_y: 0.15
+                on_release: app.capture_photo()
+                pos: root.width / 2 - 30, root.height / 2 - 30
+        
+        # Results section
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: 0.5
+            spacing: 5
+            
+            # Hebrew text
+            Label:
+                text: 'Hebrew Text:'
+                size_hint_y: 0.1
+                font_size: '12sp'
+                bold: True
+                pos: root.width / 2 - 60 , root.height / 2 - 60
+            
+            ScrollView:
+                size_hint_y: 0.3
+                Label:
+                    id: hebrew_label
+                    text: 'Awaiting text...'
+                    size_hint_y: None
+                    height: max(self.texture_size[1], 50)
+                    text_size: self.width, None
+            
+            # English text
+            Label:
+                text: 'English Translation:'
+                size_hint_y: 0.1
+                font_size: '12sp'
+                bold: True
+                pos: root.width / 2 - 90 , root.height / 2 - 90
+            
+            ScrollView:
+                size_hint_y: 0.3
+                Label:
+                    id: english_label
+                    text: 'Awaiting translation...'
+                    size_hint_y: None
+                    height: max(self.texture_size[1], 50)
+                    text_size: self.width, None
+            
+            # Play audio button
+            Button:
+                id: play_button
+                text: 'Play Audio'
+                size_hint_y: 0.2
+                disabled: True
+                on_release: app.play_audio()
+                pos: root.width / 2 - 120 , root.height / 2 - 120
