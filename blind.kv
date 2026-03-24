@@ -3,74 +3,155 @@
 <Blind>:
     BoxLayout:
         orientation: 'vertical'
-        padding: 10
-        spacing: 10
+        padding: 0
+        spacing: 0
+        size_hint: 1, 1
+        pos: root.pos
+        size: root.size
         
-        # Camera section
+        # Camera section (75% of screen)
         BoxLayout:
             orientation: 'vertical'
-            size_hint_y: 0.5
+            size_hint: 1, 0.75
+            padding: 10
+            spacing: 5
+            canvas.before:
+                Color:
+                    rgba: 0.1, 0.1, 0.1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
             
-            # Camera preview sometimes unreliable in Kivy on Windows; we capture directly via OpenCV.
-            Camera:
-                id: camera
-                resolution: (1080, 1920)
-                play: True
-                size_hint_y: 0.85
-                pos: root.width / 2 + 30 , root.height / 2 + 30
+            Image:
+                id: camera_image
+                size_hint: 1, 0.85
+                allow_stretch: True
             
             Button:
                 id: capture_button
                 text: 'Capture'
-                size_hint_y: 0.15
                 on_release: app.capture_photo()
-                pos: root.width / 2 - 30, root.height / 2 - 30
+                size_hint: 1, 0.15
+                font_size: '28sp'
         
-        # Results section
+        # Results section (25% of screen)
         BoxLayout:
             orientation: 'vertical'
-            size_hint_y: 0.5
-            spacing: 5
+            size_hint: 1, 0.25
+            spacing: 2
+            padding: 8
+            canvas.before:
+                Color:
+                    rgba: 0.15, 0.15, 0.15, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
             
-            # Hebrew text
-            Label:
-                text: 'Hebrew Text:'
-                size_hint_y: 0.1
-                font_size: '12sp'
-                bold: True
-                pos: root.width / 2 - 60 , root.height / 2 - 60
-            
-            ScrollView:
-                size_hint_y: 0.3
+            # Top row: Filename + Audio controls
+            BoxLayout:
+                size_hint: 1, 0.12
+                spacing: 5
+                
                 Label:
-                    id: hebrew_label
-                    text: 'Awaiting text...'
-                    size_hint_y: None
-                    height: max(self.texture_size[1], 50)
-                    text_size: self.width, None
+                    id: filename_label
+                    text: 'File: none'
+                    font_size: '12sp'
+                    color: 1, 1, 0, 1
+                    size_hint: 0.3, 1
+                
+                Button:
+                    id: play_hebrew_btn
+                    text: 'Hebrew Audio'
+                    disabled: True
+                    on_release: app.play_hebrew_audio()
+                    size_hint: 0.2, 1
+                    font_size: '14sp'
+                
+                Button:
+                    id: play_english_btn
+                    text: 'English Audio'
+                    disabled: True
+                    on_release: app.play_english_audio()
+                    size_hint: 0.2, 1
+                    font_size: '14sp'
+                
+                Button:
+                    id: stop_btn
+                    text: 'Stop'
+                    disabled: True
+                    on_release: app.stop_audio()
+                    size_hint: 0.15, 1
+                    font_size: '14sp'
             
-            # English text
-            Label:
-                text: 'English Translation:'
-                size_hint_y: 0.1
-                font_size: '12sp'
-                bold: True
-                pos: root.width / 2 - 90 , root.height / 2 - 90
-            
-            ScrollView:
-                size_hint_y: 0.3
+            # Audio slider for scrubbing
+            BoxLayout:
+                size_hint: 1, 0.06
+                spacing: 5
+                
                 Label:
-                    id: english_label
-                    text: 'Awaiting translation...'
-                    size_hint_y: None
-                    height: max(self.texture_size[1], 50)
-                    text_size: self.width, None
+                    id: time_current_label
+                    text: '0:00'
+                    font_size: '10sp'
+                    size_hint: 0.1, 1
+                
+                Slider:
+                    id: audio_slider
+                    min: 0
+                    max: 1
+                    value: 0
+                    on_touch_down: app.on_slider_touch_down(self)
+                    on_touch_move: app.on_slider_touch_move(self)
+                    on_touch_up: app.on_slider_touch_up(self)
+                    disabled: True
+                    size_hint: 0.8, 1
+                
+                Label:
+                    id: time_total_label
+                    text: '0:00'
+                    font_size: '10sp'
+                    size_hint: 0.1, 1
             
-            # Play audio button
-            Button:
-                id: play_button
-                text: 'Play Audio'
-                size_hint_y: 0.2
-                disabled: True
-                on_release: app.play_audio()
-                pos: root.width / 2 - 120 , root.height / 2 - 120
+            # Hebrew text row
+            BoxLayout:
+                size_hint: 1, 0.44
+                spacing: 5
+                
+                Label:
+                    text: 'Hebrew:'
+                    font_size: '12sp'
+                    bold: True
+                    size_hint: 0.15, 1
+                
+                ScrollView:
+                    size_hint: 0.85, 1
+                    Label:
+                        id: hebrew_label
+                        text: 'Awaiting text...'
+                        size_hint_y: None
+                        height: max(self.texture_size[1], 20)
+                        text_size: self.width, None
+                        font_size: '11sp'
+                        font_name: 'C:\\Windows\\Fonts\\arial.ttf'
+            
+            # English text row
+            BoxLayout:
+                size_hint: 1, 0.44
+                spacing: 5
+                
+                Label:
+                    
+                    text: 'English:'
+                    font_size: '12sp'
+                    bold: True
+                    size_hint: 0.15, 1
+                
+                ScrollView:
+                    size_hint: 0.85, 1
+                    Label:
+                        id: english_label
+                        text: 'Awaiting translation...'
+                        size_hint_y: None
+                        height: max(self.texture_size[1], 20)
+                        text_size: self.width, None
+                        font_size: '11sp'
+                        font_name: 'C:\\Windows\\Fonts\\arial.ttf'
